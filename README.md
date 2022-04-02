@@ -10,4 +10,5 @@ https://betterprogramming.pub/blockchain-introduction-using-real-world-dapp-reac
 # Run
 
 1. `cd app`
-2. `npm start`
+2. `npm install`
+3. `npm start`

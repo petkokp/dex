@@ -5,14 +5,18 @@ on:
     branches: [develop, master]
 
 jobs:
-  build:
+  build-react:
 
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: app
 
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]
-
+        
     steps:
     - name: Checkout
       uses: actions/checkout@v3

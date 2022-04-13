@@ -49,5 +49,5 @@
     "@typescript-eslint/parser": "^5.18.0",
     "gh-pages": "^3.2.3",
     "typescript": "^4.6.3"
-  },
+  }
 }

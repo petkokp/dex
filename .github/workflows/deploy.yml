@@ -30,6 +30,8 @@ jobs:
       run: npm run lint --if-present
     - name: Build
       run: npm run build --if-present
+    - name: Deploy setup
+      run: git subtree push --prefix public dex gh-pages
     - name: Deploy to Github Pages
       uses: peaceiris/actions-gh-pages@v3
       with:

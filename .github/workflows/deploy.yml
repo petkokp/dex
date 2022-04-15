@@ -53,6 +53,8 @@ jobs:
       run: npm install truffle -g
     - name: Install Truffle dependencies
       run: npm install
+    - name: Initialize Truffle
+      run: truffle init
     - name: Migrate Truffle
       run: truffle migrate
     - name: Run Truffle test
@@ -63,8 +65,3 @@ jobs:
         CC_SECRET: ${{ secrets.CC_SECRET }}
     - name: Run Test Coverage
       run: truffle run coverage
-    - name: Deploy to Github Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-        publish_dir: ./build

@@ -54,7 +54,7 @@ jobs:
     - name: Install Truffle dependencies
       run: npm install
     - name: Run Truffle test
-      run: CI=true truffle test
+      run: truffle test
     - name: Run Codechecks
       run: npx codechecks
       env:

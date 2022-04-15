@@ -53,6 +53,8 @@ jobs:
       run: npm install truffle -g
     - name: Install Truffle dependencies
       run: npm install
+    - name: Migrate Truffle
+      run: truffle migrate
     - name: Run Truffle test
       run: truffle test
     - name: Run Codechecks

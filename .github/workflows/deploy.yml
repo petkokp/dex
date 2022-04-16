@@ -60,9 +60,11 @@ jobs:
       run: npm install truffle -g
     - name: Install dependencies
       run: npm install
-    - name: Run Truffle develop and test
-      run: | 
-        truffle develop &
+    - name: Run Truffle develop
+      run: |
+        truffle develop
+        ping 127.0.0.1 -n 6 > nul
+        echo "test"
         truffle test
     - name: Compile and deploy contracts to Kovan
       run: truffle migrate --reset —-network kovan

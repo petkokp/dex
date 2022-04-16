@@ -61,4 +61,4 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Deploy contracts to Kovan
-      run: truffle migrate —-network kovan
+      run: truffle.cmd migrate --network kovan

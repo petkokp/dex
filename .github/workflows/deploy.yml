@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-      INFURA_ENDPOINT: https://kovan.infura.io/v3/1d4972f6179e45efbff08d17e5d658ff
+      INFURA_ENDPOINT: ${{ secrets.INFURA_ENDPOINT }}
 
     defaults:
       run:
@@ -61,12 +61,12 @@ jobs:
     - name: Install dependencies
       run: npm install
     - name: Run Truffle test
-      run: truffle test --network kovan
+      run: truffle test
     - name: Run Codechecks
       run: npx codechecks
       env:
         CC_SECRET: ${{ secrets.CC_SECRET }}
     - name: Run Test Coverage
-      run: truffle run coverage --network kovan
+      run: truffle run coverage
     - name: Deploy contracts to Kovan
       run: truffle migrate —-network kovan

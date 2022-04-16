@@ -1,12 +1,9 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 const privateKey = process.env.PRIVATE_KEY;
 
 const endpoint = process.env.INFURA_ENDPOINT;
-
-console.log('PRIVATE KEY: ', privateKey);
-console.log('ENDPOINT: ', endpoint);
 
 module.exports = {
   networks: {

@@ -15,8 +15,8 @@ module.exports = {
     kovan: {
       // must be a thunk, otherwise truffle commands may hang in CI
       provider: () => new HDWalletProvider({
-        privateKeys: ['0xc9814423ea537bd5ff0aaf22d08a37b032a7cb6455aff950b12627f9f9ddfb4d'],
-        providerOrUrl: 'https://kovan.infura.io/v3/1d4972f6179e45efbff08d17e5d658ff',
+        privateKeys: [privateKey],
+        providerOrUrl: endpoint,
       }),
       network_id: 42,
     },

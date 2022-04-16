@@ -5,6 +5,9 @@ const privateKey = process.env.PRIVATE_KEY;
 
 const endpoint = process.env.INFURA_ENDPOINT;
 
+console.log('PRIVATE KEY: ', privateKey);
+console.log('ENDPOINT: ', endpoint);
+
 module.exports = {
   networks: {
     development: {

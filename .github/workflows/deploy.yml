@@ -63,4 +63,4 @@ jobs:
     - name: Run Truffle test
       run: truffle test --network kovan
     - name: Compile and deploy contracts to Kovan
-      run: truffle migrate —-network kovan --reset
+      run: truffle migrate --reset —-network kovan

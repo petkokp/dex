@@ -60,11 +60,5 @@ jobs:
       run: npm install truffle -g
     - name: Install dependencies
       run: npm install
-    - name: Run Codechecks
-      run: npx codechecks
-      env:
-        CC_SECRET: ${{ secrets.CC_SECRET }}
-    - name: Run Test Coverage
-      run: truffle run coverage
     - name: Deploy contracts to Kovan
       run: truffle migrate —-network kovan

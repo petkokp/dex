@@ -13,6 +13,7 @@ https://betterprogramming.pub/blockchain-introduction-using-real-world-dapp-reac
 
 # Setup local blockchain environment
 
-1. Run `truffle develop` to start local blockchain environment
-1. Test contracts with `truffle test`
-2. Deploy contracts to local network with `truffle migrate`
+1. `cd contracts`
+2. Run `truffle develop` to start local blockchain environment
+3. Test contracts with `truffle test`
+4. Deploy contracts to local network with `truffle migrate`

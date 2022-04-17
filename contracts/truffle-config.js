@@ -1,5 +1,6 @@
-const HDWalletProvider = require('@truffle/hdwallet-provider');
 require('dotenv').config({ path: '../.env' });
+
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 const privateKey = process.env.PRIVATE_KEY;
 
@@ -13,7 +14,6 @@ module.exports = {
       network_id: '*',
     },
     kovan: {
-      // must be a thunk, otherwise truffle commands may hang in CI
       provider: () => new HDWalletProvider({
         privateKeys: [privateKey],
         providerOrUrl: endpoint,

@@ -7,7 +7,7 @@ contract AMM {
     uint totalToken2;
     //above should be done with pool once implemented.
 
-    uint K; // Algorithmic constant used to determine price (K = totalToken1 * totalToken2
+    uint K; // Algorithmic constant used to determine price (K = totalToken1 * totalToken2)
 
     uint constant PRECISION = 1_000_000;
     mapping(address => uint) shares;
@@ -107,5 +107,37 @@ contract AMM {
             token2Balance[msg.sender] += amountToken2;
     }
 
-    
+    // returns how much token2 user will get swapping token1 to token2
+    function getSwapToken1Estimate(uint _amountToken1) public view activePool returns (uint amountToken2) {
+        uint token1After = totalToken1 + _amountToken1;
+        uint token2After = K / token1After;
+        amountToken2 = totalToken2 - token2After;
+
+        // To ensure that Token2's pool is not completely depleted leading to inf:0 ratio
+        if (amountToken2 == totalToken2) {
+            amountToken2--;
+        }
+    }
+
+    // returns how much token1 is needed to get X amount of token2 
+    function getSwapToken1EstimateGivenToken2(uint _amountToken2) public view activePool returns (uint amountToken1) {
+        require(_amountToken2 < totalToken2, "Insufficient pool balance");
+        uint token2After = totalToken2 - _amountToken2;
+        uint token1After = K / token2After;
+        amountToken1 = token1After - totalToken1;
+    }
+
+    // Swaps given amount of Token1 to Token2 using algorithmic price determination
+    function swapToken1(uint _amountToken1) external 
+        activePool 
+        validAmountCheck(token1Balance, _amountToken1) 
+        returns(uint amountToken2) {
+
+        amountToken2 = getSwapToken1Estimate(_amountToken1);
+
+        token1Balance[msg.sender] -= _amountToken1;
+        totalToken1 += _amountToken1;
+        totalToken2 -= amountToken2;
+        token2Balance[msg.sender] += amountToken2;
+    }
 }

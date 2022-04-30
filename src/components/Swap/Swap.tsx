@@ -10,11 +10,9 @@ import {
   IconButton,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useWeb3Provider } from '../../hooks';
+import { useSigner } from '../../hooks';
 
 export function Swap() {
-  const { address, balance, sendTransaction } = useWeb3Provider();
-
   const [valueToSwap, setValueToSwap] = useState(0);
   const [valueToReceive, setValueToReceive] = useState(0);
 
@@ -29,10 +27,13 @@ export function Swap() {
     setTokenToReceive(event.target.value as string);
   };
 
+  const signer = useSigner();
+
   const handleSwap = () => {
-    if (balance && balance >= valueToSwap /* calculate gas somewhere */) {
-      sendTransaction?.({
-        to: address, // address of the contract
+    const balance = signer?.getBalance();
+    if (balance && +balance >= valueToSwap /* calculate gas somewhere */) {
+      signer?.sendTransaction?.({
+        to: '', // address of the contract
         value: valueToSwap,
       });
     }

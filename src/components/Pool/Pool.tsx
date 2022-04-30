@@ -10,7 +10,7 @@ import {
   IconButton,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useWeb3Provider } from '../../hooks';
+import { useSigner } from '../../hooks';
 
 export function Pool() {
   const [firstToken, setFirstToken] = useState('ETH');
@@ -27,12 +27,13 @@ export function Pool() {
     setSecondToken(event.target.value as string);
   };
 
-  const { address, balance, sendTransaction } = useWeb3Provider();
+  const signer = useSigner();
 
   const handleAddingLiquidity = () => {
-    if (balance && balance >= firstTokenValue /* calculate gas somewhere */) {
-      sendTransaction?.({
-        to: address, // address of the contract
+    const balance = signer?.getBalance();
+    if (balance && +balance >= firstTokenValue /* calculate gas somewhere */) {
+      signer?.sendTransaction?.({
+        to: '', // address of the contract
         value: firstTokenValue,
       });
     }

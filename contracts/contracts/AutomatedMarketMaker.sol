@@ -14,7 +14,7 @@ contract AMM {
     mapping(address => uint256) token1Balance;
     mapping(address => uint256) token2Balance;
 
-    constructor(address) {}
+    constructor() {}
 
     modifier validAmountCheck(
         mapping(address => uint256) storage _balance,

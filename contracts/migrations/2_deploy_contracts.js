@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
 const DexToken = artifacts.require('DexToken');
 const AutomatedMarketMaker = artifacts.require('AMM');
 const LiquidityPool = artifacts.require('LiquidityPool');

@@ -11,6 +11,8 @@ import {
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSigner } from '../../hooks';
+import { AutomatedMarketMakerService } from '../../services';
+import AMM from '../../abis/AMM.json';
 
 export function Swap() {
   const [valueToSwap, setValueToSwap] = useState(0);
@@ -29,13 +31,28 @@ export function Swap() {
 
   const signer = useSigner();
 
-  const handleSwap = () => {
-    const balance = signer?.getBalance();
-    if (balance && +balance >= valueToSwap /* calculate gas somewhere */) {
-      signer?.sendTransaction?.({
-        to: '', // address of the contract
-        value: valueToSwap,
-      });
+  const handleSwap = async () => {
+    try {
+      const balance = await signer?.getBalance();
+
+      const chainId = signer?.provider?.network.chainId.toString();
+
+      if (chainId && balance && balance.gt(valueToSwap)) {
+        const automatedMarketMakerService = AutomatedMarketMakerService.getInstance();
+        await automatedMarketMakerService.getAMMContract({
+          abi: AMM.abi,
+          address: (AMM.networks as Record<string, Record<string, unknown>>)
+            ?.[chainId].address as string,
+        });
+
+        const response = await automatedMarketMakerService.swapFirstToken(
+          valueToSwap,
+        );
+
+        if (!response) console.log('Could not swap tokens');
+      }
+    } catch (error) {
+      console.error('Swap failed: ', error);
     }
   };
 

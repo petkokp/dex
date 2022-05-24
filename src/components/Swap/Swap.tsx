@@ -2,9 +2,6 @@ import { useState } from 'react';
 import {
   Button,
   Container,
-  Select,
-  MenuItem,
-  SelectChangeEvent,
   TextField,
   Typography,
   IconButton,
@@ -15,19 +12,8 @@ import { AutomatedMarketMakerService } from '../../services';
 import AMM from '../../abis/AMM.json';
 
 export function Swap() {
-  const [valueToSwap, setValueToSwap] = useState(0);
-  const [valueToReceive, setValueToReceive] = useState(0);
-
-  const [tokenToSwap, setTokenToSwap] = useState('ETH');
-  const [tokenToReceive, setTokenToReceive] = useState('AAVE');
-
-  const changeTokenToSwap = (event: SelectChangeEvent) => {
-    setTokenToSwap(event.target.value as string);
-  };
-
-  const changeTokenToReceive = (event: SelectChangeEvent) => {
-    setTokenToReceive(event.target.value as string);
-  };
+  const [valueToSwap, setValueToSwap] = useState<number>();
+  const [valueToReceive, setValueToReceive] = useState<number>();
 
   const signer = useSigner();
 
@@ -37,12 +23,13 @@ export function Swap() {
 
       const chainId = signer?.provider?.network.chainId.toString();
 
-      if (chainId && balance && balance.gt(valueToSwap)) {
+      if (chainId && balance && valueToSwap && balance.gt(valueToSwap)) {
         const automatedMarketMakerService = AutomatedMarketMakerService.getInstance();
         await automatedMarketMakerService.getAMMContract({
           abi: AMM.abi,
-          address: (AMM.networks as Record<string, Record<string, unknown>>)
-            ?.[chainId].address as string,
+          address: (AMM.networks as Record<string, Record<string, unknown>>)?.[
+            chainId
+          ].address as string,
         });
 
         const response = await automatedMarketMakerService.swapFirstToken(
@@ -66,15 +53,14 @@ export function Swap() {
         label="Amount"
         type="number"
         value={valueToSwap}
-        onChange={(event) => setValueToSwap(Number(event.target.value))}
+        placeholder="Amount to swap"
+        onChange={(event) => {
+          const value = Number(event.target.value);
+          if (value) setValueToSwap(value);
+        }}
         InputProps={{
-          endAdornment: (
-            <Select value={tokenToSwap} onChange={changeTokenToSwap}>
-              <MenuItem value="ETH">ETH</MenuItem>
-              <MenuItem value="AAVE">AAVE</MenuItem>
-              <MenuItem value="USDT">USDT</MenuItem>
-            </Select>
-          ),
+          endAdornment: <Typography>ETH</Typography>,
+          inputProps: { min: 0 },
         }}
         variant="outlined"
       />
@@ -83,15 +69,14 @@ export function Swap() {
         label="Amount"
         type="number"
         value={valueToReceive}
-        onChange={(event) => setValueToReceive(Number(event.target.value))}
+        placeholder="Amount to receive"
+        onChange={(event) => {
+          const value = Number(event.target.value);
+          if (value) setValueToSwap(value);
+        }}
         InputProps={{
-          endAdornment: (
-            <Select value={tokenToReceive} onChange={changeTokenToReceive}>
-              <MenuItem value="ETH">ETH</MenuItem>
-              <MenuItem value="AAVE">AAVE</MenuItem>
-              <MenuItem value="USDT">USDT</MenuItem>
-            </Select>
-          ),
+          endAdornment: <Typography>DEX</Typography>,
+          inputProps: { min: 0 },
         }}
         variant="outlined"
       />

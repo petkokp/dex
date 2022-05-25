@@ -83,35 +83,40 @@ contract LiquidityPool is ReentrancyGuard {
         return false;
     }
     
-
+    //eth to dex
     function swapToken1ToToken2() external payable {
         require(msg.value > 0, "Amount cannot be zero!");
 
         //get swap rate
         uint estimatedTokens = __marketMaker.getSwapToken1Estimate(msg.value);
-        require(__depositToken.balanceOf(address(this)) >= estimatedTokens);
+        require(__depositToken.balanceOf(address(this)) >= estimatedTokens, "Not Enough Funds");
 
         //do the swap
         uint tokenAmount = __marketMaker.swapToken1(msg.value);
-        //transfer - might be an issue in case we want to expand in the future?
+
+        //transfer dex to user
+        //might be an issue in case we want to expand in the future?
         __depositToken.transferFrom(address(this), msg.sender, tokenAmount);
-        emit TokenSwapped(msg.sender, address(__depositToken), msg.value, tokenAmount);
+        //contract receives eth through msg.value
+
+        emit TokenSwapped(msg.sender, address(this), msg.value, tokenAmount);
     }
 
-    //WIP DONT USE
-    /*
+    //dex to eth
     function swapToken2ToToken1() external payable {
         require(msg.value > 0, "Amount cannot be zero!");
 
-        //get swap rate
-        uint estimatedTokens = __marketMaker.getSwapToken1Estimate(msg.value);
-        require(__depositToken.balanceOf(address(this)) >= estimatedTokens);
+        uint estimatedTokens = __marketMaker.getSwapToken2Estimate(msg.value);
+        require((address(this).balance) >= estimatedTokens, "Not Enough Funds");
 
-        //do the swap
-        uint tokenAmount = __marketMaker.swapToken1(msg.value);
-        //transfer - might be an issue in case we want to expand in the future?
-        __depositToken.transferFrom(address(this), msg.sender, tokenAmount);
-        emit TokenSwapped(msg.sender, address(__depositToken), msg.value, tokenAmount);
+        uint ethAmount = __marketMaker.swapToken2(msg.value);
+
+        //send eth to user
+        payable(msg.sender).transfer(ethAmount);
+
+        //get user's dextokens
+        __depositToken.transferFrom(address(this), msg.sender, msg.value);
+        emit TokenSwapped(address(this), msg.sender, ethAmount, msg.value);
     }
-    */
+    
 }

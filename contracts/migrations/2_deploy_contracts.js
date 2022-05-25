@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const DexToken = artifacts.require('DexToken');
-const AutomatedMarketMaker = artifacts.require('AMM');
+const AutomatedMarketMaker = artifacts.require('AutomatedMarketMaker');
 const LiquidityPool = artifacts.require('LiquidityPool');
 
 // eslint-disable-next-line func-names

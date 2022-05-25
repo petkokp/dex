@@ -46,7 +46,7 @@ contract DexToken is ERC20, Ownable {
   }
 
   //ERC223 WIP
-  /*
+  /*  
   function transfer(address _to, uint _value, bytes memory _data) public returns (bool) {
     if (_value > 0 && _value <= __balanceOf[msg.sender] && isContract(_to)) {
         __balanceOf[msg.sender] -= _value;

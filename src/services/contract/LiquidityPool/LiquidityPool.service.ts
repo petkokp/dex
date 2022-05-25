@@ -3,11 +3,20 @@ import { SignerService } from '../../signer';
 import { ContractMetadata } from '../contract.interface';
 
 export interface ILiquidityPoolService {
-  getLiquidityPoolContract: (contractMetadata: ContractMetadata) => Promise<Contract | undefined>;
-  deposit: (firstAmount: number, secondAmount: number) => Promise<boolean | undefined>;
+  getLiquidityPoolContract: (
+    contractMetadata: ContractMetadata
+  ) => Promise<Contract | undefined>;
+  deposit: (
+    firstAmount: number,
+    secondAmount: number
+  ) => Promise<boolean | undefined>;
   withdraw: (amount: string) => Promise<boolean | undefined>;
   transfer(recipient: string, amount: number): Promise<boolean | undefined>;
-  transferFrom(sender: string, recipient: string, amount: number): Promise<boolean | undefined>;
+  transferFrom(
+    sender: string,
+    recipient: string,
+    amount: number
+  ): Promise<boolean | undefined>;
 }
 
 export class LiquidityPoolService implements ILiquidityPoolService {
@@ -39,7 +48,10 @@ export class LiquidityPoolService implements ILiquidityPoolService {
 
   async deposit(firstAmount: number, secondAmount: number) {
     try {
-      const response: boolean = await this.contract?.deposit(firstAmount, secondAmount);
+      const response: boolean = await this.contract?.deposit(
+        firstAmount,
+        secondAmount,
+      );
 
       if (!response) console.log('Could not deposit liquidity');
 
@@ -65,7 +77,10 @@ export class LiquidityPoolService implements ILiquidityPoolService {
 
   async transfer(recipient: string, amount: number) {
     try {
-      const response: boolean = await this.contract?.transfer(recipient, amount);
+      const response: boolean = await this.contract?.transfer(
+        recipient,
+        amount,
+      );
 
       if (!response) console.log('Could not transfer liquidity');
 
@@ -78,9 +93,44 @@ export class LiquidityPoolService implements ILiquidityPoolService {
 
   async transferFrom(sender: string, recipient: string, amount: number) {
     try {
-      const response: boolean = await this.contract?.transferFrom(sender, recipient, amount);
+      const response: boolean = await this.contract?.transferFrom(
+        sender,
+        recipient,
+        amount,
+      );
 
       if (!response) console.log('Could not transfer liquidity from: ', sender);
+
+      return response;
+    } catch (error) {
+      console.error('Could not transfer liquidity: ', error);
+      return undefined;
+    }
+  }
+
+  async swapEthForDex(sender: string, recipient: string, amount: number) {
+    try {
+      const response = await this.contract?.swapToken1ToToken2(
+        sender,
+        recipient,
+        amount,
+      );
+
+      console.log('LP - swapEthForDex: ', response);
+    } catch (error) {
+      console.error('Could not transfer liquidity: ', error);
+    }
+  }
+
+  async swapDexForEth(sender: string, recipient: string, amount: number) {
+    try {
+      const response = await this.contract?.swapToken1ToToken2(
+        sender,
+        recipient,
+        amount,
+      );
+
+      console.log('LP - swapEthForDex: ', response);
 
       return response;
     } catch (error) {

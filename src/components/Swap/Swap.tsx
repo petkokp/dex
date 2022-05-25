@@ -7,11 +7,19 @@ import {
   IconButton,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
+import { utils } from 'ethers';
 import { useSigner } from '../../hooks';
-import { AutomatedMarketMakerService } from '../../services';
-import AMM from '../../abis/AMM.json';
+import LP from '../../abis/LiquidityPool.json';
+import { LiquidityPoolService } from '../../services';
+
+enum Tokens {
+  ETH = 'ETH',
+  DEX = 'DEX',
+}
 
 export function Swap() {
+  const [tokenToSwap, setTokenToSwap] = useState(Tokens.ETH);
   const [valueToSwap, setValueToSwap] = useState<number>();
   const [valueToReceive, setValueToReceive] = useState<number>();
 
@@ -24,19 +32,22 @@ export function Swap() {
       const chainId = signer?.provider?.network.chainId.toString();
 
       if (chainId && balance && valueToSwap && balance.gt(valueToSwap)) {
-        const automatedMarketMakerService = AutomatedMarketMakerService.getInstance();
-        await automatedMarketMakerService.getAMMContract({
-          abi: AMM.abi,
-          address: (AMM.networks as Record<string, Record<string, unknown>>)?.[
+        const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
+          abi: LP.abi,
+          address: (LP.networks as Record<string, Record<string, unknown>>)?.[
             chainId
           ].address as string,
         });
 
-        const response = await automatedMarketMakerService.swapFirstToken(
-          valueToSwap,
-        );
+        const response = tokenToSwap
+          ? await contract?.swapToken1ToToken2({
+            value: utils.parseEther(valueToSwap.toString()),
+          })
+          : await contract?.swapToken1ToToken2({
+            value: utils.parseEther(valueToSwap.toString()),
+          });
 
-        if (!response) console.log('Could not swap tokens');
+        console.log('swap response: ', response);
       }
     } catch (error) {
       console.error('Swap failed: ', error);
@@ -44,7 +55,7 @@ export function Swap() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container sx={{ display: 'flex', flexDirection: 'column' }} maxWidth="sm">
       <IconButton onClick={() => history.back()}>
         <ArrowBackIcon />
       </IconButton>
@@ -59,11 +70,17 @@ export function Swap() {
           if (value) setValueToSwap(value);
         }}
         InputProps={{
-          endAdornment: <Typography>ETH</Typography>,
+          endAdornment: <Typography>{tokenToSwap}</Typography>,
           inputProps: { min: 0 },
         }}
         variant="outlined"
       />
+      <IconButton
+        style={{ marginTop: 20 }}
+        onClick={() => setTokenToSwap(tokenToSwap === Tokens.DEX ? Tokens.ETH : Tokens.DEX)}
+      >
+        <SwapVertIcon />
+      </IconButton>
       <Typography style={{ marginTop: 20, marginBottom: 20 }}>For</Typography>
       <TextField
         label="Amount"
@@ -75,7 +92,11 @@ export function Swap() {
           if (value) setValueToSwap(value);
         }}
         InputProps={{
-          endAdornment: <Typography>DEX</Typography>,
+          endAdornment: (
+            <Typography>
+              {tokenToSwap === Tokens.DEX ? Tokens.ETH : Tokens.DEX}
+            </Typography>
+          ),
           inputProps: { min: 0 },
         }}
         variant="outlined"

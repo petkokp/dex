@@ -27,7 +27,7 @@ contract LiquidityPool is ReentrancyGuard {
     uint256 private poolTotalDeposits = 0;
 
 
-    ERC20 private __depositToken;
+    DexToken private __depositToken;
     AutomatedMarketMaker private __marketMaker;
 
     bool allLPsCanWithdraw = true;
@@ -37,7 +37,7 @@ contract LiquidityPool is ReentrancyGuard {
     event Approval(address approver, address spender, uint256 amount);
 
     //crashes with param?
-    constructor(ERC20 _token) payable {
+    constructor(DexToken _token) payable {
         __depositToken = _token;
         __marketMaker = new AutomatedMarketMaker();
     }

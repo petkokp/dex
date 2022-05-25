@@ -37,8 +37,8 @@ contract LiquidityPool is ReentrancyGuard {
     event Approval(address approver, address spender, uint256 amount);
 
     //crashes with param?
-    constructor(DexToken _token) payable {
-        __depositToken = _token;
+    constructor() payable {
+        __depositToken = new DexToken();
         __marketMaker = new AutomatedMarketMaker();
     }
 

@@ -39,15 +39,17 @@ export function Swap() {
           ].address as string,
         });
 
-        const response = tokenToSwap
+        const response = tokenToSwap === Tokens.ETH
           ? await contract?.swapToken1ToToken2({
             value: utils.parseEther(valueToSwap.toString()),
+            gasLimit: 100000,
           })
           : await contract?.swapToken1ToToken2({
             value: utils.parseEther(valueToSwap.toString()),
+            gasLimit: 100000,
           });
 
-        console.log('swap response: ', response);
+        await response.wait();
       }
     } catch (error) {
       console.error('Swap failed: ', error);

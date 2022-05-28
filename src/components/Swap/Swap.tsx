@@ -12,11 +12,7 @@ import { utils } from 'ethers';
 import { useSigner } from '../../hooks';
 import LP from '../../abis/LiquidityPool.json';
 import { LiquidityPoolService } from '../../services';
-
-enum Tokens {
-  ETH = 'ETH',
-  DEX = 'DEX',
-}
+import { Tokens } from '../tokens';
 
 export function Swap() {
   const [tokenToSwap, setTokenToSwap] = useState(Tokens.ETH);

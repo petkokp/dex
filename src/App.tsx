@@ -7,19 +7,26 @@ import {
   getRoot, getSwap, getPool, getContacts,
 } from './routes/paths';
 
-export default function App() {
-  const [value, setValue] = React.useState(0);
+enum TabValues {
+  HOME = 0,
+  SWAP = 1,
+  POOL = 2,
+  CONTACTS = 3,
+}
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+export default function App() {
+  const [tabValue, setTabValue] = React.useState(TabValues.HOME);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
   };
 
   return (
     <>
       <AppBar position="static">
         <Tabs
-          value={value}
-          onChange={handleChange}
+          value={tabValue}
+          onChange={handleTabChange}
           indicatorColor="secondary"
           textColor="inherit"
           variant="fullWidth"

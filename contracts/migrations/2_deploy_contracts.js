@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const DexToken = artifacts.require('DexToken');
 const AutomatedMarketMaker = artifacts.require('AutomatedMarketMaker');
 const LiquidityPool = artifacts.require('LiquidityPool');

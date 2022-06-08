@@ -9,6 +9,7 @@ export const useSigner = () => {
     async function load() {
       try {
         const signerService = SignerService.getInstance();
+
         const rpcSigner = await signerService.getSigner();
 
         setSigner(rpcSigner);

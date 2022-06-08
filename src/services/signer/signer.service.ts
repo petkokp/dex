@@ -15,15 +15,20 @@ export class SignerService implements ISignerService {
   }
 
   async getSigner() {
-    await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
+    try {
+      await (window as any).ethereum.request({ method: 'eth_requestAccounts' });
 
-    const web3Provider = new providers.Web3Provider((window as any).ethereum);
+      const web3Provider = new providers.Web3Provider((window as any).ethereum);
 
-    await web3Provider.send('eth_requestAccounts', []);
+      await web3Provider.send('eth_requestAccounts', []);
 
-    this.signer = web3Provider.getSigner();
+      this.signer = web3Provider.getSigner();
 
-    return this.signer;
+      return this.signer;
+    } catch (error) {
+      console.error('Could not get signer: ', error);
+      return undefined;
+    }
   }
 }
 

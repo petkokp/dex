@@ -27,7 +27,7 @@ export class DexTokenService implements IDexTokenService {
       const signerService = SignerService.getInstance();
       const signer = await signerService.getSigner();
 
-      this.contract = new Contract(address, abi, signer);
+      this.contract = signer ? new Contract(address, abi, signer) : undefined;
 
       return this.contract;
     } catch (error) {

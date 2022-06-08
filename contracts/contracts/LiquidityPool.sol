@@ -32,35 +32,36 @@ contract LiquidityPool is ReentrancyGuard {
 
     bool allLPsCanWithdraw = true;
     event CapitalProvided(address optionsMarketAddress, uint256 amount);
-    event TokenSwapped(address account, address token, uint amountToken1, uint amountToken2);
+    //event TokenSwapped(address account, address token, uint amountToken1, uint amountToken2);
     event Transfer(address from, address to, uint256 tokens);
     event Approval(address approver, address spender, uint256 amount);
 
-    //crashes with param?
-    constructor() payable {
-        __depositToken = new DexToken();
-        __marketMaker = new AutomatedMarketMaker();
+    event ProvidedLP(address sender, address receiver, uint256 amount1, uint256 amount2);
+
+    
+    constructor(DexToken _token, AutomatedMarketMaker _amm) payable {
+        __depositToken = _token;
+        __marketMaker = _amm;
     }
 
     //for now _amount1 will be ETH and _amount2 will be dextoken hardcoded.
-    function deposit(uint256 _amount1, uint256 _amount2)
+    function deposit(uint256 _dexAmount)
         public
         payable
         returns (bool)
     {
-        require(_amount1 > 0 && _amount2 > 0, "Invalid Amount");
+        require(_dexAmount > 0, "Invalid Amount");
 
         (bool validShare, uint256 share) = __marketMaker.provide(
-            _amount1,
-            _amount2,
+            msg.value,
+            _dexAmount,
             poolTotalDeposits
         );
         if (validShare) {
-            __depositToken.transferFrom(msg.sender, address(this), _amount1);
-            __depositToken.transferFrom(msg.sender, address(this), _amount2);            
-
+            __depositToken.transferFrom(msg.sender, address(this), _dexAmount);            
             poolTotalDeposits += share;
-            poolTotalValue += (_amount1 + _amount2);
+            poolTotalValue += (msg.value + _dexAmount);
+            emit ProvidedLP(msg.sender, address(this), msg.value, _dexAmount);
             return true;
         }
         return false;
@@ -73,10 +74,10 @@ contract LiquidityPool is ReentrancyGuard {
             "You must withdraw a percentage between 0 and 100"
         );
 
-        (uint256 amount1, uint256 amount2, bool validShare) = __marketMaker.withdraw(_amount, poolTotalDeposits);
+        (uint256 weiAmount, uint256 dexAmount, bool validShare) = __marketMaker.withdraw(_amount, poolTotalDeposits);
         if (validShare) {
-            payable(msg.sender).transfer(amount1); 
-            __depositToken.transferFrom(address(this), msg.sender, amount2);
+            payable(msg.sender).transfer(weiAmount); 
+            __depositToken.transfer(msg.sender, dexAmount);
             return true;
         }
 
@@ -96,27 +97,27 @@ contract LiquidityPool is ReentrancyGuard {
 
         //transfer dex to user
         //might be an issue in case we want to expand in the future?
-        __depositToken.transferFrom(address(this), msg.sender, tokenAmount);
+        __depositToken.transfer(msg.sender, tokenAmount);
         //contract receives eth through msg.value
 
-        emit TokenSwapped(msg.sender, address(this), msg.value, tokenAmount);
+        //emit TokenSwapped(msg.sender, address(this), msg.value, tokenAmount);
     }
 
     //dex to eth
-    function swapToken2ToToken1() external payable {
-        require(msg.value > 0, "Amount cannot be zero!");
+    function swapToken2ToToken1(uint _dexToken) external {
+        require(_dexToken > 0, "Amount cannot be zero!");
 
-        uint estimatedTokens = __marketMaker.getSwapToken2Estimate(msg.value);
+        uint estimatedTokens = __marketMaker.getSwapToken2Estimate(_dexToken);
         require((address(this).balance) >= estimatedTokens, "Not Enough Funds");
 
-        uint ethAmount = __marketMaker.swapToken2(msg.value);
+        uint ethAmount = __marketMaker.swapToken2(_dexToken);
 
         //send eth to user
         payable(msg.sender).transfer(ethAmount);
 
         //get user's dextokens
-        __depositToken.transferFrom(address(this), msg.sender, msg.value);
-        emit TokenSwapped(address(this), msg.sender, ethAmount, msg.value);
+        __depositToken.transferFrom(msg.sender, address(this), _dexToken);
+        //emit TokenSwapped(address(this), msg.sender, ethAmount, msg.value);
     }
     
 }

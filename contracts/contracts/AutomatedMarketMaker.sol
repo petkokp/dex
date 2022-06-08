@@ -23,7 +23,6 @@ contract AutomatedMarketMaker {
     {
         validShare = false;
         if (poolTotalDeposits == 0) {
-            console.log("expect first");
             share = 100; //first LP
         } else {
             uint256 share1 = (poolTotalDeposits * _amountToken1) / totalToken1;
@@ -103,9 +102,8 @@ contract AutomatedMarketMaker {
         uint256 token1After = totalToken1 + _amountToken1;
         uint256 token2After = K / token1After;
         amountToken2 = totalToken2 - token2After;
-
         // To ensure that Token2's pool is not completely depleted leading to inf:0 ratio
-        if (amountToken2 == totalToken2) {
+        if (amountToken2 == totalToken2 && totalToken2 != 0) {
             amountToken2--;
         }
     }

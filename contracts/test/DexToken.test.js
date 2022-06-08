@@ -1,59 +1,132 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable indent */
+/* eslint-disable one-var-declaration-per-line */
+/* eslint-disable one-var */
+/* eslint-disable semi */
+/* eslint-disable quotes */
+/* eslint-disable spaced-comment */
+/* eslint-disable no-trailing-spaces */
+/* eslint-disable linebreak-style */
 /* eslint-disable no-undef */
 
-const DexToken = artifacts.require('DexToken');
+//const DexToken = artifacts.require('DexToken');
+//const LiquidityPool = artifacts.require('LiquidityPool');
 
-contract('Dex token', async (accounts) => {
-  it('should get max supply', async () => {
-    const tokenInstance = await DexToken.deployed();
-    const balance = await tokenInstance.getMaxSupply();
-    assert.equal(balance.valueOf(), 1000 * 10 ** 18);
-  });
+const { expect } = require('chai');
+const { ethers } = require('hardhat');
 
-  it('should transfer token', async () => {
-    const tokenInstance = await DexToken.deployed();
 
-    await tokenInstance.transfer(
-      accounts[1],
-      5000,
-      { from: accounts[0] },
-    );
+describe('Experiment', () => {
+  let Token, Pool, AMM;
+  let token, pool, amm;
+  let addr1, addr2;
 
-    const firstAccountBalance = await tokenInstance.balanceOf(accounts[0]);
+  beforeEach(async () => {
+    Token = await ethers.getContractFactory('DexToken');
+    token = await Token.deploy();
 
-    const secondAccountBalance = await tokenInstance.balanceOf(
-      accounts[1],
-    );
+    AMM = await ethers.getContractFactory('AutomatedMarketMaker');
+    amm = await AMM.deploy();
 
-    assert.equal(BigInt(firstAccountBalance), 999999999999999995000n);
+    Pool = await ethers.getContractFactory('LiquidityPool');
+    pool = await Pool.deploy(token.address, amm.address);
 
-    assert.equal(BigInt(secondAccountBalance), 5000);
-  });
+    await token.transfer(pool.address, 100000);
 
-  it('should burn tokens', async () => {
-    const tokenInstance = await DexToken.deployed();
+    [addr1, addr2] = await ethers.getSigners();
+  })
 
-    const balanceBefore = await tokenInstance.getMaxSupply();
+  it('should have name and symbol', async () => {
+    console.log("Check: both name and symbol have expected values.")
+    expect(await token.name()).to.equal("Dex Token")
+    expect(await token.symbol()).to.equal("DEX");
+  })
 
-    assert.equal(balanceBefore.valueOf(), 1000 * 10 ** 18);
+  it('should have all supply', async () => {
+    expect(await token.balanceOf(pool.address)).to.equal(100000);
+  })
 
-    await tokenInstance.burn(1000);
+  it('should deposit', async () => {
+    AMM = await ethers.getContractFactory('AutomatedMarketMaker');
+    amm = await AMM.deploy();
 
-    const balanceAfter = await tokenInstance.getMaxSupply();
+    Pool = await ethers.getContractFactory('LiquidityPool');
+    pool = await Pool.deploy(token.address, amm.address);
+    console.log("---------------------------------------DEPLOY-------------------------------------")
 
-    assert.equal(balanceAfter.valueOf(), (1000 * 10 ** 18) - 1000);
-  });
+    await token.approve(pool.address, 200);
+    await pool.deposit(100, 100);
+    
+    //await pool.connect(addr1).deposit(100, 100);
+    //await pool.connect(addr1).
+  })
+})
 
-  it('should mint tokens', async () => {
-    const tokenInstance = await DexToken.deployed();
 
-    await tokenInstance.burn(1000);
+// contract('Dex token', async (accounts) => {
+//   let token;
+//   let pool;
 
-    await tokenInstance.mint(accounts[2], 1000);
+//   before(async () => {
+//     token = await DexToken.new();
+//     //pool = await LiquidityPool.new();
+//   });
 
-    const thirdAccountBalance = await tokenInstance.balanceOf(
-      accounts[2],
-    );
+//   it('should get max supply', async () => {
+//     const balance = await token.getMaxSupply();
+//     assert.equal(balance.valueOf(), 100000); 
+//   });
 
-    assert.equal(BigInt(thirdAccountBalance), 1000);
-  });
-});
+//   it('should transfer token', async () => {
+//     console.log('hello ', await token.balanceOf(token.address));
+//     console.log('acc1 ', await token.balanceOf(accounts[0]));
+//     console.log('acc2 ', await token.balanceOf(accounts[1]));
+//     await token.approve(accounts[0], 100);
+//     await token.transferFrom(accounts[0], accounts[1], 100);
+
+//     console.log('hello');
+//     const firstAccountBalance = await token.balanceOf(accounts[0]);
+        
+//     const secondAccountBalance = await token.balanceOf(accounts[1]);
+//     console.log('hi', secondAccountBalance);
+//     console.log('DICKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK', firstAccountBalance);
+//     assert.equal(firstAccountBalance, 99500);
+
+//     assert.equal(secondAccountBalance, 5000);
+//   });
+
+  // it('provide idfk', async() => {
+  //     const worked = await pool.deposit(100, 100);
+  //     console.log('did it worked');
+
+  //     assert.equal(true, worked)
+  // })
+
+  // it('should burn tokens', async () => {
+  //   const tokenInstance = await DexToken.deployed();
+
+  //   const balanceBefore = await tokenInstance.getMaxSupply();
+
+  //   assert.equal(balanceBefore.valueOf(), 100000);
+
+  //   await tokenInstance.burn(1000);
+
+//     const balanceAfter = await tokenInstance.getMaxSupply();
+
+//     assert.equal(balanceAfter.valueOf(), (100000) - 1000);
+//   });
+
+//   it('should mint tokens', async () => {
+//     const tokenInstance = await DexToken.deployed();
+
+//     await tokenInstance.burn(1000);
+
+//     await tokenInstance.mint(accounts[2], 1000);
+
+//     const thirdAccountBalance = await tokenInstance.balanceOf(
+//       accounts[2],
+//     );
+
+//     assert.equal(BigInt(thirdAccountBalance), 1000);
+//   });
+// });

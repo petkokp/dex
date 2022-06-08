@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.10 <0.9.0;
+pragma solidity 0.8.9;
+
+import "hardhat/console.sol";
 
 contract AutomatedMarketMaker {
     uint256 totalToken1;
@@ -21,6 +23,7 @@ contract AutomatedMarketMaker {
     {
         validShare = false;
         if (poolTotalDeposits == 0) {
+            console.log("expect first");
             share = 100; //first LP
         } else {
             uint256 share1 = (poolTotalDeposits * _amountToken1) / totalToken1;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.8.10 <0.9.0;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "./DexToken.sol";
 import "./AutomatedMarketMaker.sol";
+
+import "hardhat/console.sol";
 
 contract LiquidityPool is ReentrancyGuard {
     using SafeMath for uint256;
@@ -36,10 +38,12 @@ contract LiquidityPool is ReentrancyGuard {
     event Transfer(address from, address to, uint256 tokens);
     event Approval(address approver, address spender, uint256 amount);
 
+    event ProvidedLP(address sender, address receiver, uint256 amount1, uint256 amount2);
+
     //crashes with param?
-    constructor() payable {
-        __depositToken = new DexToken();
-        __marketMaker = new AutomatedMarketMaker();
+    constructor(DexToken _token, AutomatedMarketMaker _amm) payable {
+        __depositToken = _token;
+        __marketMaker = _amm;
     }
 
     //for now _amount1 will be ETH and _amount2 will be dextoken hardcoded.
@@ -56,11 +60,14 @@ contract LiquidityPool is ReentrancyGuard {
             poolTotalDeposits
         );
         if (validShare) {
+            console.log("should be valid");
+            console.log("msg sender:", msg.sender);
             __depositToken.transferFrom(msg.sender, address(this), _amount1);
             __depositToken.transferFrom(msg.sender, address(this), _amount2);            
 
             poolTotalDeposits += share;
             poolTotalValue += (_amount1 + _amount2);
+            emit ProvidedLP(msg.sender, address(this), _amount1, _amount2);
             return true;
         }
         return false;

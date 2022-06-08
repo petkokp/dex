@@ -1,17 +1,22 @@
 {
-  "name": "client",
+  "name": "dex",
   "version": "0.1.0",
   "private": true,
   "homepage": "https://petkokp.github.io/dex",
   "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
+    "@mui/icons-material": "^5.6.2",
+    "@mui/material": "^5.6.2",
     "@openzeppelin/contracts": "^4.5.0",
-    "@testing-library/jest-dom": "^5.16.3",
-    "@testing-library/react": "^12.1.4",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
-    "@truffle/hdwallet-provider": "^2.0.6",
+    "@truffle/hdwallet-provider": "^2.0.7",
     "@types/jest": "^27.4.1",
-    "@types/react": "^17.0.43",
-    "@types/react-dom": "^17.0.14",
+    "@types/node": "^16.11.27",
+    "@types/react": "^18.0.6",
+    "@types/react-dom": "^18.0.2",
     "dotenv": "^8.2.0",
     "eslint": "^7.11.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -19,22 +24,30 @@
     "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "react": "^17.0.0",
-    "react-dom": "^17.0.0",
-    "react-scripts": "^4.0.3",
+    "ethers": "^4.0.49",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.3.0",
+    "react-scripts": "5.0.1",
     "truffle": "^5.5.10",
-    "web-vitals": "^2.1.4",
-    "web3": "^1.7.1",
-    "ts-node": "^10.7.0"
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.3",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "CI=false && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "browserslist": {
     "production": [

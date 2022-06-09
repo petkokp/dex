@@ -27,7 +27,10 @@ export function Swap() {
 
       const chainId = signer?.provider?.network.chainId.toString();
 
+      debugger;
+
       if (chainId && balance && valueToSwap && balance.gt(valueToSwap)) {
+        debugger;
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
           abi: LP.abi,
           address: (LP.networks as Record<string, Record<string, unknown>>)?.[
@@ -38,14 +41,16 @@ export function Swap() {
         const response = tokenToSwap === Tokens.ETH
           ? await contract?.swapToken1ToToken2({
             value: utils.parseEther(valueToSwap.toString()),
-            gasLimit: 100000,
+            gasLimit: 40000,
           })
-          : await contract?.swapToken1ToToken2({
+          : await contract?.swapToken2ToToken1({
             value: utils.parseEther(valueToSwap.toString()),
-            gasLimit: 100000,
+            gasLimit: 40000,
           });
 
         await response.wait();
+
+        console.log('response: ', response);
       }
     } catch (error) {
       console.error('Swap failed: ', error);
@@ -87,7 +92,7 @@ export function Swap() {
         placeholder="Amount to receive"
         onChange={(event) => {
           const value = Number(event.target.value);
-          if (value) setValueToSwap(value);
+          if (value) setValueToReceive(value);
         }}
         InputProps={{
           endAdornment: (

@@ -40,8 +40,7 @@ export function Swap() {
             value: utils.parseEther(valueToSwap.toString()),
             gasLimit: 40000,
           })
-          : await contract?.swapToken2ToToken1({
-            value: utils.parseEther(valueToSwap.toString()),
+          : await contract?.swapToken2ToToken1(valueToSwap, {
             gasLimit: 40000,
           });
 

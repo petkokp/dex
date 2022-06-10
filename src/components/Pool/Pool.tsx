@@ -5,6 +5,7 @@ import {
   TextField,
   Typography,
   IconButton,
+  Divider,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSigner } from '../../hooks';
@@ -15,6 +16,7 @@ import LP from '../../abis/LiquidityPool.json';
 export function Pool() {
   const [ethValue, setEthValue] = useState(0);
   const [dexValue, setDexValue] = useState(0);
+  const [percentageToWithdraw, setPercentageToWithdraw] = useState(0);
 
   const signer = useSigner();
 
@@ -24,12 +26,8 @@ export function Pool() {
 
       const chainId = signer?.provider?.network.chainId.toString();
 
-      const canAddLiquidity = chainId
-        && balance
-        && ethValue
-        && dexValue
-        && balance.gt(ethValue)
-        && balance.gt(dexValue);
+      // eth or dex value?
+      const canAddLiquidity = chainId && balance && ethValue && balance.gt(ethValue);
 
       if (canAddLiquidity) {
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
@@ -39,14 +37,41 @@ export function Pool() {
           ].address as string,
         });
 
-        const response = await contract?.deposit(ethValue, dexValue, {
-          gasLimit: 100000,
+        const response = await contract?.deposit(ethValue, {
+          gasLimit: 40000,
         });
 
         await response.wait();
       }
     } catch (error) {
       console.error('Adding liquidity failed: ', error);
+    }
+  };
+
+  const handleWithdrawingLiquidity = async () => {
+    try {
+      const balance = await signer?.getBalance();
+
+      const chainId = signer?.provider?.network.chainId.toString();
+
+      const canAddLiquidity = chainId && percentageToWithdraw;
+
+      if (canAddLiquidity) {
+        const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
+          abi: LP.abi,
+          address: (LP.networks as Record<string, Record<string, unknown>>)?.[
+            chainId
+          ].address as string,
+        });
+
+        const response = await contract?.withdraw(percentageToWithdraw, {
+          gasLimit: 40000,
+        });
+
+        await response.wait();
+      }
+    } catch (error) {
+      console.error('Withdrawing liquidity failed: ', error);
     }
   };
 
@@ -98,6 +123,34 @@ export function Pool() {
         onClick={handleAddingLiquidity}
       >
         Add Liquidity
+      </Button>
+      <Divider />
+      <Typography style={{ marginTop: 20, marginBottom: 20 }}>
+        Withdraw liquidity
+      </Typography>
+      <Typography style={{ marginTop: 20, marginBottom: 20 }}>
+        Select % to withdraw
+      </Typography>
+      <TextField
+        label="Percentage"
+        type="number"
+        value={percentageToWithdraw}
+        onChange={(event) => {
+          const value = Number(event.target.value);
+          if (value) setPercentageToWithdraw(value);
+        }}
+        InputProps={{
+          endAdornment: <Typography>%</Typography>,
+          inputProps: { min: 0, max: 100 },
+        }}
+        variant="outlined"
+      />
+      <Button
+        variant="contained"
+        style={{ marginTop: 20 }}
+        onClick={handleWithdrawingLiquidity}
+      >
+        Withdraw Liquidity
       </Button>
     </Container>
   );

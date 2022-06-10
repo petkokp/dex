@@ -27,10 +27,7 @@ export function Swap() {
 
       const chainId = signer?.provider?.network.chainId.toString();
 
-      debugger;
-
       if (chainId && balance && valueToSwap && balance.gt(valueToSwap)) {
-        debugger;
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
           abi: LP.abi,
           address: (LP.networks as Record<string, Record<string, unknown>>)?.[

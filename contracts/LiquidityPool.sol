@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.8.10 <0.9.0;
+pragma solidity 0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "./DexToken.sol";
 import "./AutomatedMarketMaker.sol";
+
+import "hardhat/console.sol";
 
 contract LiquidityPool is ReentrancyGuard {
     using SafeMath for uint256;
@@ -104,6 +106,7 @@ contract LiquidityPool is ReentrancyGuard {
     }
 
     //dex to eth
+
     function swapToken2ToToken1(uint _dexToken) external {
         require(_dexToken > 0, "Amount cannot be zero!");
 
@@ -116,6 +119,7 @@ contract LiquidityPool is ReentrancyGuard {
         payable(msg.sender).transfer(ethAmount);
 
         //get user's dextokens
+
         __depositToken.transferFrom(msg.sender, address(this), _dexToken);
         //emit TokenSwapped(address(this), msg.sender, ethAmount, msg.value);
     }

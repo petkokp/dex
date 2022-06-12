@@ -39,10 +39,6 @@ jobs:
       PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
       INFURA_ENDPOINT: ${{ secrets.INFURA_ENDPOINT }}
 
-    defaults:
-      run:
-        working-directory: contracts
-
     strategy:
       matrix:
         node-version: [16.x]
@@ -56,13 +52,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies
       run: npm install
-    - name: Install Truffle
-      run: npm install truffle -g
-    - name: Install dependencies
-      run: npm install
-    - name: Run Truffle develop
-      run: truffle develop &
-    - name: Run Truffle test
-      run: truffle test
-    - name: Compile and deploy contracts to Kovan
-      run: truffle migrate --reset --network kovan
+    - name: Test contracts
+      run: npx hardhat test
+    - name: Compile and deploy contracts to Ropsten
+      run: npx hardhat run scripts/deploy.js

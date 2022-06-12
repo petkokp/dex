@@ -106,7 +106,8 @@ contract LiquidityPool is ReentrancyGuard {
     }
 
     //dex to eth
-    function swapToken2ToToken1(uint _dexToken) external payable {
+
+    function swapToken2ToToken1(uint _dexToken) external {
         require(_dexToken > 0, "Amount cannot be zero!");
 
         uint estimatedTokens = __marketMaker.getSwapToken2Estimate(_dexToken);
@@ -118,7 +119,8 @@ contract LiquidityPool is ReentrancyGuard {
         payable(msg.sender).transfer(ethAmount);
 
         //get user's dextokens
-        __depositToken.transferFrom(msg.sender, address(this), msg.value);
+
+        __depositToken.transferFrom(msg.sender, address(this), _dexToken);
         //emit TokenSwapped(address(this), msg.sender, ethAmount, msg.value);
     }
     

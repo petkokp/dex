@@ -8,6 +8,7 @@ const privateKey = process.env.PRIVATE_KEY;
 const endpoint = process.env.INFURA_ENDPOINT;
 
 module.exports = {
+  contracts_build_directory: '../src/abis',
   networks: {
     development: {
       host: '127.0.0.1',

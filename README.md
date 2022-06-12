@@ -8,7 +8,7 @@
 
 # Test Deploy
 
-`npx hardhat scripts/deploy.js`
+`npx hardhat run scripts/deploy.js`
 OR
-`npx hardhat scripts/deploy.js --network ropsten`
+`npx hardhat run scripts/deploy.js --network ropsten`
 

@@ -3,6 +3,8 @@ pragma solidity 0.8.9;
 
 import "hardhat/console.sol";
 
+import "./PriceConsumer.sol";
+
 contract AutomatedMarketMaker {
     uint256 totalToken1;
     uint256 totalToken2;
@@ -12,7 +14,11 @@ contract AutomatedMarketMaker {
 
     uint256 K; // Algorithmic constant used to determine price (K = totalToken1 * totalToken2)
 
-    constructor() {}
+    PriceConsumer private __priceConsumer;
+
+    constructor(PriceConsumer priceConsumer) {
+        __priceConsumer = priceConsumer;
+    }
 
     // function to add liquidity to pool
     function provide(
@@ -23,7 +29,7 @@ contract AutomatedMarketMaker {
     {
         validShare = false;
         if (poolTotalDeposits == 0) {
-            share = 100; //first LP
+            share = uint(__priceConsumer.getLatestPriceEth()); // first LP
         } else {
             uint256 share1 = (poolTotalDeposits * _amountToken1) / totalToken1;
             uint256 share2 = (poolTotalDeposits * _amountToken2) / totalToken2;

@@ -20,39 +20,69 @@ contract LiquidityPool is ReentrancyGuard {
 
     uint256 public poolTotalValue = 0;
     uint256 private poolTotalDeposits = 0;
+    uint256 private poolTotalFees = 0;
+    uint256 private poolTotalProfitFromFees = 0;
 
     DexToken private __depositToken;
     AutomatedMarketMaker private __marketMaker;
 
     //event TokenSwapped(address account, address token, uint amountToken1, uint amountToken2);
-    event ProvidedLP(address sender, address receiver, uint256 amount1, uint256 amount2);
-    
+    event Transfer(address from, address to, uint256 tokens);
+    event Approval(address approver, address spender, uint256 amount);
+
+    event ProvidedLP(
+        address sender,
+        address receiver,
+        uint256 amount1,
+        uint256 amount2
+    );
+
     constructor(DexToken _token, AutomatedMarketMaker _amm) payable {
         __depositToken = _token;
         __marketMaker = _amm;
     }
 
-    //for now _amount1 will be ETH and _amount2 will be dextoken hardcoded.
-    function deposit(uint256 _dexAmount)
-        public
-        payable
-        returns (bool)
-    {
+    // for now _amount1 will be ETH and _amount2 will be dextoken hardcoded.
+    function deposit(uint256 _dexAmount) public payable returns (bool) {
         require(_dexAmount > 0, "Invalid Amount");
 
+        uint256 dexAmountMinusFee = ((_dexAmount * 10) - (_dexAmount * 3) / 100) / 10;
+
+        uint256 ethAmountMinusFee = msg.value - (msg.value * 3) / 1000;
+
         (bool validShare, uint256 share) = __marketMaker.provide(
-            msg.value,
-            _dexAmount,
+            ethAmountMinusFee,
+            dexAmountMinusFee,
             poolTotalDeposits
         );
         if (validShare) {
-            __depositToken.transferFrom(msg.sender, address(this), _dexAmount);            
+            __depositToken.transferFrom(msg.sender, address(this), dexAmountMinusFee);
             poolTotalDeposits += share;
-            poolTotalValue += (msg.value + _dexAmount);
-            emit ProvidedLP(msg.sender, address(this), msg.value, _dexAmount);
+            poolTotalValue += (ethAmountMinusFee + dexAmountMinusFee);
+            poolTotalFees += (msg.value - ethAmountMinusFee + _dexAmount - dexAmountMinusFee);
+            poolTotalProfitFromFees += poolTotalFees / 4;
+
+            address zeroAddress = 0x0000000000000000000000000000000000000000;
+
+            __depositToken.burn(_dexAmount * 3 / 4000);
+            payable(zeroAddress).transfer(((msg.value * 3) / 1000) / 4);
+
+            emit ProvidedLP(msg.sender, address(this), ethAmountMinusFee, dexAmountMinusFee);
             return true;
         }
         return false;
+    }
+
+    function getPoolTotalValue() public view returns (uint256) {
+        return poolTotalValue;
+    }
+
+    function getPoolTotalFees() public view returns (uint256) {
+        return poolTotalFees;
+    }
+
+    function getPoolTotalProfitFromFees() public view returns (uint256) {
+        return poolTotalProfitFromFees;
     }
 
     //_amount here is represented in %
@@ -62,26 +92,32 @@ contract LiquidityPool is ReentrancyGuard {
             "You must withdraw a percentage between 0 and 100"
         );
 
-        (uint256 weiAmount, uint256 dexAmount, bool validShare) = __marketMaker.withdraw(_amount, poolTotalDeposits);
+        (uint256 weiAmount, uint256 dexAmount, bool validShare) = __marketMaker
+            .withdraw(_amount, poolTotalDeposits);
         if (validShare) {
-            payable(msg.sender).transfer(weiAmount); 
+            payable(msg.sender).transfer(weiAmount);
             __depositToken.transfer(msg.sender, dexAmount);
             return true;
         }
 
         return false;
     }
-    
+
     //eth to dex
     function swapToken1ToToken2() nonReentrant external payable {
         require(msg.value > 0, "Amount cannot be zero!");
 
         //get swap rate
-        uint estimatedTokens = __marketMaker.getSwapToken1Estimate(msg.value);
-        require(__depositToken.balanceOf(address(this)) >= estimatedTokens, "Not Enough Funds");
+        uint256 estimatedTokens = __marketMaker.getSwapToken1Estimate(
+            msg.value
+        );
+        require(
+            __depositToken.balanceOf(address(this)) >= estimatedTokens,
+            "Not Enough Funds"
+        );
 
         //do the swap
-        uint tokenAmount = __marketMaker.swapToken1(msg.value);
+        uint256 tokenAmount = __marketMaker.swapToken1(msg.value);
 
         //transfer dex to user
         //might be an issue in case we want to expand in the future?
@@ -96,10 +132,12 @@ contract LiquidityPool is ReentrancyGuard {
     function swapToken2ToToken1(uint _dexToken) nonReentrant external {
         require(_dexToken > 0, "Amount cannot be zero!");
 
-        uint estimatedTokens = __marketMaker.getSwapToken2Estimate(_dexToken);
+        uint256 estimatedTokens = __marketMaker.getSwapToken2Estimate(
+            _dexToken
+        );
         require((address(this).balance) >= estimatedTokens, "Not Enough Funds");
 
-        uint ethAmount = __marketMaker.swapToken2(_dexToken);
+        uint256 ethAmount = __marketMaker.swapToken2(_dexToken);
 
         //send eth to user
         payable(msg.sender).transfer(ethAmount);
@@ -109,5 +147,4 @@ contract LiquidityPool is ReentrancyGuard {
         __depositToken.transferFrom(msg.sender, address(this), _dexToken);
         //emit TokenSwapped(address(this), msg.sender, ethAmount, msg.value);
     }
-    
 }

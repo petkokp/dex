@@ -9,6 +9,9 @@ const key = process.env.PRIVATE_KEY;
 module.exports = {
   solidity: '0.8.9',
   networks: {
+    hardhat: {
+      chainId: 1337
+    },
     ropsten: {
       url: INFURA,
       accounts: [`0x${key}`],

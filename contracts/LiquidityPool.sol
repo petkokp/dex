@@ -14,32 +14,18 @@ import "hardhat/console.sol";
 contract LiquidityPool is ReentrancyGuard {
     using SafeMath for uint256;
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Only owner can complete this tx");
-        _;
-    }
-
     fallback() external payable {}
 
     receive() external payable {}
 
-    mapping(address => bool) public tokenAddressWhitelisted;
-    address public owner;
     uint256 public poolTotalValue = 0;
     uint256 private poolTotalDeposits = 0;
-
 
     DexToken private __depositToken;
     AutomatedMarketMaker private __marketMaker;
 
-    bool allLPsCanWithdraw = true;
-    event CapitalProvided(address optionsMarketAddress, uint256 amount);
     //event TokenSwapped(address account, address token, uint amountToken1, uint amountToken2);
-    event Transfer(address from, address to, uint256 tokens);
-    event Approval(address approver, address spender, uint256 amount);
-
     event ProvidedLP(address sender, address receiver, uint256 amount1, uint256 amount2);
-
     
     constructor(DexToken _token, AutomatedMarketMaker _amm) payable {
         __depositToken = _token;
@@ -70,7 +56,7 @@ contract LiquidityPool is ReentrancyGuard {
     }
 
     //_amount here is represented in %
-    function withdraw(uint256 _amount) public returns (bool) {
+    function withdraw(uint256 _amount) nonReentrant public returns (bool) {
         require(
             _amount > 0 && _amount <= 100,
             "You must withdraw a percentage between 0 and 100"
@@ -87,7 +73,7 @@ contract LiquidityPool is ReentrancyGuard {
     }
     
     //eth to dex
-    function swapToken1ToToken2() external payable {
+    function swapToken1ToToken2() nonReentrant external payable {
         require(msg.value > 0, "Amount cannot be zero!");
 
         //get swap rate
@@ -107,7 +93,7 @@ contract LiquidityPool is ReentrancyGuard {
 
     //dex to eth
 
-    function swapToken2ToToken1(uint _dexToken) external {
+    function swapToken2ToToken1(uint _dexToken) nonReentrant external {
         require(_dexToken > 0, "Amount cannot be zero!");
 
         uint estimatedTokens = __marketMaker.getSwapToken2Estimate(_dexToken);

@@ -85,18 +85,6 @@ contract LiquidityPool is ReentrancyGuard {
         return false;
     }
 
-    function getPoolTotalValue() external view returns (uint256) {
-        return poolTotalValue;
-    }
-
-    function getPoolTotalFees() external view returns (uint256) {
-        return poolTotalFees;
-    }
-
-    function getPoolTotalProfitFromFees() external view returns (uint256) {
-        return poolTotalProfitFromFees;
-    }
-
     //_amount here is represented in %
     function withdraw(uint256 _amount) external nonReentrant returns (bool) {
         require(

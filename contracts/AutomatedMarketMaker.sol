@@ -1,46 +1,41 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 
-import "hardhat/console.sol";
-
-import "./PriceConsumer.sol";
-
 contract AutomatedMarketMaker {
-    uint256 totalToken1;
-    uint256 totalToken2;
+    uint256 public totalToken1;
+    uint256 public totalToken2;
 
-    mapping(address => uint256) token1Balance;
+    mapping(address => uint256) token1Balance; //eth balance
     mapping(address => uint256) token2Balance;
 
-    uint256 K; // Algorithmic constant used to determine price (K = totalToken1 * totalToken2)
+    uint256 private K; // Algorithmic constant used to determine price (K = totalToken1 * totalToken2)
 
-    PriceConsumer private __priceConsumer;
+    uint256[2] public tokenRatio;
 
-    constructor(PriceConsumer priceConsumer) {
-        __priceConsumer = priceConsumer;
-    }
-
+    constructor() {}
+    
     // function to add liquidity to pool
     function provide(
         uint256 _amountToken1,
-        uint256 _amountToken2,
-        uint256 poolTotalDeposits
-    ) external returns (bool validShare, uint256 share) 
+        uint256 _amountToken2
+    ) external returns (bool validShare) 
     {
         validShare = false;
-        if (poolTotalDeposits == 0) {
-            share = uint(__priceConsumer.getLatestPriceEth()); // first LP
+        if (K == 0) {
+            //first LP
+            tokenRatio[0] = _amountToken1;
+            tokenRatio[1] = _amountToken1;
         } else {
-            uint256 share1 = (poolTotalDeposits * _amountToken1) / totalToken1;
-            uint256 share2 = (poolTotalDeposits * _amountToken2) / totalToken2;
-            require(share1 == share2, "Provided tokens are not of equivalent value.");
-            share = share1;
+            uint newRatio1 = tokenRatio[0] + _amountToken1;
+            uint newRatio2 = tokenRatio[1] + _amountToken2;
+
+            require(newRatio1 / newRatio2 == tokenRatio[0] / tokenRatio[1], "Provided tokens are not of equivalent value.");
+            tokenRatio[0] = newRatio1;
+            tokenRatio[1] = newRatio2;
         }
 
-        require(share > 0, "Asset value is not enough to contribute.");
-
         token1Balance[msg.sender] += _amountToken1;
-        token2Balance[msg.sender] += _amountToken2;
+        token2Balance[msg.sender] += _amountToken2;        
 
         totalToken1 += _amountToken1;
         totalToken2 += _amountToken2;
@@ -65,35 +60,21 @@ contract AutomatedMarketMaker {
         reqToken2 = (totalToken2 * _amountToken1) / totalToken1;
     }
 
-    // functions to remove liquidity
-    function getWithdrawEstimate(uint256 _share, uint256 poolTotalDeposits)
-        public
-        view
-        returns (uint256 amountToken1, uint256 amountToken2)
-    {
-        require(
-            _share <= poolTotalDeposits,
-            "Share should be less than totalShare"
-        );
-        amountToken1 = (_share * totalToken1) / poolTotalDeposits;
-        amountToken2 = (_share * totalToken2) / poolTotalDeposits;
-    }
-
-    function withdraw(uint256 _share, uint256 poolTotalDeposits)
+    function withdraw(uint256 _share)
         external
         returns (uint256 amountToken1, uint256 amountToken2, bool validShare)
     {
         validShare = false;
-        (amountToken1, amountToken2) = getWithdrawEstimate(
-            _share,
-            poolTotalDeposits
-        );
+        require(token1Balance[msg.sender] > 0 && token2Balance[msg.sender] > 0, "You do not have anything to withdraw");        
+
+        amountToken1 = (token1Balance[msg.sender] * _share) / 100;
+        amountToken2 = (token2Balance[msg.sender] * _share) / 100;       
 
         token1Balance[msg.sender] -= amountToken1;
         token2Balance[msg.sender] -= amountToken2;
 
         totalToken1 -= amountToken1;
-        totalToken2 -= amountToken2;
+        totalToken2 -= amountToken2; 
         K = totalToken1 * totalToken2;
 
         validShare = true;

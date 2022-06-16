@@ -4,8 +4,6 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-import "hardhat/console.sol";
-
 contract DexToken is ERC20, Ownable {
   string _name = 'Dex Token';
   string _symbol = 'DEX';

@@ -22,13 +22,6 @@ async function main() {
     const LiquidityPool = await ethers.getContractFactory('LiquidityPool');
     const lp = await LiquidityPool.deploy(token.address, market.address);
     console.log('Pool address: ', lp.address);
-
-    //manual abi adding
-    // const data = {
-    //     address: token.address,
-    //     abi: JSON.parse(token.interface.format('json')),
-    // };
-    // fs.writeFileSync('src/DexToken.json', JSON.stringify(data));
 }
 
 main()

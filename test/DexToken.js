@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable no-undef */
 const { expect } = require('chai');
 const { ethers } = require('hardhat');
@@ -8,7 +9,6 @@ describe('Experiment', () => {
   let amm;
   let owner;
   let addr1;
-  let priceConsumer;
 
   beforeEach(async () => {
     try {
@@ -17,11 +17,8 @@ describe('Experiment', () => {
       const Token = await ethers.getContractFactory('DexToken');
       token = await Token.deploy();
 
-      const PriceConsumer = await ethers.getContractFactory('PriceConsumer');
-      priceConsumer = await PriceConsumer.deploy(token.address);
-
       const AMM = await ethers.getContractFactory('AutomatedMarketMaker');
-      amm = await AMM.deploy(priceConsumer.address);
+      amm = await AMM.deploy();
 
       const Pool = await ethers.getContractFactory('LiquidityPool');
       pool = await Pool.deploy(token.address, amm.address);
@@ -48,52 +45,50 @@ describe('Experiment', () => {
   });
 
   // Temporary commented out, need to figure out a way to mock chainlink data feed
-  // it('should deposit', async () => {
-  //   const { provider } = waffle;
+  it('should deposit', async () => {
+    const { provider } = waffle;
 
-  //   await token.connect(addr1).approve(pool.address, 100);
-  //   await pool.connect(addr1).deposit(100, {
-  //     value: ethers.utils.parseEther('100').toString(),
-  //   });
+    await token.connect(addr1).approve(pool.address, 100);
+    await pool.connect(addr1).deposit(100, {
+      value: ethers.utils.parseEther('100').toString(),
+    });
 
-  //   expect(
-  //     ethers.utils.formatEther(await provider.getBalance(pool.address)),
-  //   ).to.equal('99.925');
-  //   expect((await token.balanceOf(addr1.address)).toString()).to.equal('901');
-  //   expect((await token.balanceOf(pool.address)).toString()).to.equal(
-  //     '99999099',
-  //   );
-  // });
+    expect(
+      ethers.utils.formatEther(await provider.getBalance(pool.address)),
+    ).to.equal('99.925');
+    expect((await token.balanceOf(addr1.address)).toString()).to.equal('901');
+    expect((await token.balanceOf(pool.address)).toString()).to.equal(
+      '99999099',
+    );
+  });
 
-  // it("should deposit & withdraw", async () => {
-  //   await token.connect(addr1).approve(pool.address, 100);
-  //   await pool.connect(addr1).deposit(100, {
-  //     value: ethers.utils.parseEther("100").toString(),
-  //   });
+  it("should deposit & withdraw", async () => {
+    await token.connect(addr1).approve(pool.address, 100);
+    await pool.connect(addr1).deposit(100, {
+      value: ethers.utils.parseEther("100").toString(),
+    });
 
-  //   await pool.connect(addr1).withdraw(25); // in %!!!
+    await pool.connect(addr1).withdraw(25); // in %!!!
 
-  //   const { provider } = waffle;
-  //   expect(
-  //     ethers.utils.formatEther(await provider.getBalance(pool.address))
-  //   ).to.equal("75.0");
-  //   expect((await token.balanceOf(addr1.address)).toString()).to.equal("925");
-  //   expect((await token.balanceOf(pool.address)).toString()).to.equal(
-  //     "99999075"
-  //   );
-  // });
+    const { provider } = waffle;
+    expect(
+      ethers.utils.formatEther(await provider.getBalance(pool.address))
+    ).to.equal("75.0");
+    expect((await token.balanceOf(addr1.address)).toString()).to.equal("925");
+    expect((await token.balanceOf(pool.address)).toString()).to.equal("99999075");
+  });
 
-  // it("should swap in both directions", async () => {
-  //   await token.connect(addr1).approve(pool.address, 100);
-  //   await pool.connect(addr1).deposit(100, {
-  //     value: ethers.utils.parseEther("100").toString(),
-  //   });
+  it("should swap in both directions", async () => {
+    await token.connect(addr1).approve(pool.address, 100);
+    await pool.connect(addr1).deposit(100, {
+      value: ethers.utils.parseEther("100").toString(),
+    });
 
-  //   await pool.connect(addr1).swapToken1ToToken2({
-  //     value: ethers.utils.parseEther("50").toString(),
-  //   });
+    await pool.connect(addr1).swapToken1ToToken2({
+      value: ethers.utils.parseEther("50").toString(),
+    });
 
-  //   await token.connect(addr1).approve(pool.address, 34);
-  //   await pool.connect(addr1).swapToken2ToToken1(34);
-  // });
+    await token.connect(addr1).approve(pool.address, 34);
+    await pool.connect(addr1).swapToken2ToToken1(34);
+  });
 });

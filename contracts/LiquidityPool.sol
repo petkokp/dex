@@ -30,8 +30,6 @@ contract LiquidityPool is ReentrancyGuard {
     DexToken private __depositToken;
     AutomatedMarketMaker private __marketMaker;
 
-    bool private isPoolInitialized = false;
-
     //event TokenSwapped(address account, address token, uint amountToken1, uint amountToken2);
     event Transfer(address from, address to, uint256 tokens);
     event Approval(address approver, address spender, uint256 amount);

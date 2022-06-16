@@ -27,8 +27,6 @@ contract LiquidityPool is ReentrancyGuard {
 
     uint256 private poolTotalProfitFromFees = 0;
 
-    address zeroAddress = 0x0000000000000000000000000000000000000000;
-
     DexToken private __depositToken;
     AutomatedMarketMaker private __marketMaker;
 
@@ -77,7 +75,6 @@ contract LiquidityPool is ReentrancyGuard {
             poolTotalProfitFromDex += poolTotalDexFees / 4;
 
             __depositToken.burn((_dexAmount * 3) / 4000);
-            payable(zeroAddress).transfer(((msg.value * 3) / 1000) / 4);
 
             emit ProvidedLP(
                 msg.sender,

@@ -11,7 +11,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSigner } from '../../hooks';
 import { Tokens } from '../tokens';
 import { LiquidityPoolService } from '../../services';
-import LP from '../../abis/LiquidityPool.json';
+import LP from '../../abis/contracts/LiquidityPool.sol/LiquidityPool.json';
 
 export function Pool() {
   const [ethValue, setEthValue] = useState(0);
@@ -32,11 +32,10 @@ export function Pool() {
       if (canAddLiquidity) {
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
           abi: LP.abi,
-          address: (LP.networks as Record<string, Record<string, unknown>>)?.[
-            chainId
-          ].address as string,
+          address: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
         });
 
+        // to do - add dexValue
         const response = await contract?.deposit(ethValue, {
           gasLimit: 40000,
         });
@@ -59,9 +58,7 @@ export function Pool() {
       if (canAddLiquidity) {
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
           abi: LP.abi,
-          address: (LP.networks as Record<string, Record<string, unknown>>)?.[
-            chainId
-          ].address as string,
+          address: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
         });
 
         const response = await contract?.withdraw(percentageToWithdraw, {

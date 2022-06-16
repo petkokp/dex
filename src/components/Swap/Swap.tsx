@@ -10,7 +10,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { utils } from 'ethers';
 import { useSigner } from '../../hooks';
-import LP from '../../abis/LiquidityPool.json';
+import LP from '../../abis/contracts/LiquidityPool.sol/LiquidityPool.json';
 import { LiquidityPoolService } from '../../services';
 import { Tokens } from '../tokens';
 
@@ -30,9 +30,7 @@ export function Swap() {
       if (chainId && balance && valueToSwap && balance.gt(valueToSwap)) {
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
           abi: LP.abi,
-          address: (LP.networks as Record<string, Record<string, unknown>>)?.[
-            chainId
-          ].address as string,
+          address: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
         });
 
         const response = tokenToSwap === Tokens.ETH

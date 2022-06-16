@@ -41,7 +41,7 @@ describe('Experiment', () => {
   it('should have all supply', async () => {
     // sending some to addr1 for testing purposes
     expect(await token.balanceOf(addr1.address)).to.equal(1_000);
-    expect(await token.balanceOf(pool.address)).to.equal(99_999_000);
+    expect((await token.balanceOf(pool.address)).toString()).to.equal('99999000');
   });
 
   // Temporary commented out, need to figure out a way to mock chainlink data feed
@@ -55,7 +55,7 @@ describe('Experiment', () => {
 
     expect(
       ethers.utils.formatEther(await provider.getBalance(pool.address)),
-    ).to.equal('99.925');
+    ).to.equal('100.0');
     expect((await token.balanceOf(addr1.address)).toString()).to.equal('901');
     expect((await token.balanceOf(pool.address)).toString()).to.equal(
       '99999099',
@@ -73,7 +73,7 @@ describe('Experiment', () => {
     const { provider } = waffle;
     expect(
       ethers.utils.formatEther(await provider.getBalance(pool.address))
-    ).to.equal("75.0");
+    ).to.equal("75.075");
     expect((await token.balanceOf(addr1.address)).toString()).to.equal("925");
     expect((await token.balanceOf(pool.address)).toString()).to.equal("99999075");
   });

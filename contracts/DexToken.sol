@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract DexToken is ERC20, Ownable {
   string _name = 'Dex Token';
   string _symbol = 'DEX';
-  uint256 private supply = 100_000_000;
+  uint256 private supply = 100_000_000 * (10 ** 18);
 
   constructor() ERC20(_name, _symbol) {
     _mint(msg.sender, supply);

@@ -22,6 +22,15 @@ async function main() {
     const LiquidityPool = await ethers.getContractFactory('LiquidityPool');
     const lp = await LiquidityPool.deploy(token.address, market.address);
     console.log('Pool address: ', lp.address);
+
+    await token.transfer(lp.address, 99_500_000);
+    await token.transfer(deployer.address, 500_000);
+
+    await token.connect(deployer).approve(lp.address, ethers.utils.parseEther('500000').toString());
+    await lp.connect(deployer).deposit(ethers.utils.parseEther('300000').toString(), {
+        value: ethers.utils.parseEther('3').toString(),
+        gasLimit: 500_000
+    });
 }
 
 main()

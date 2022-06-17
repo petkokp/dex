@@ -1,6 +1,6 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable indent */
-const { ethers } = require("hardhat");
+const { ethers } = require('hardhat');
 
 const fs = require('fs');
 
@@ -29,13 +29,13 @@ async function main() {
     await token.connect(deployer).approve(lp.address, ethers.utils.parseEther('500000').toString());
     await lp.connect(deployer).deposit(ethers.utils.parseEther('300000').toString(), {
         value: ethers.utils.parseEther('3').toString(),
-        gasLimit: 500_000
+        gasLimit: 500_000,
     });
 }
 
 main()
     .then(() => process.exit(0))
-    .catch(error => {
+    .catch((error) => {
         console.error(error);
         process.exit(1);
     });

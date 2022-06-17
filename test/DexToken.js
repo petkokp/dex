@@ -62,30 +62,30 @@ describe('Experiment', () => {
     );
   });
 
-  it("should deposit & withdraw", async () => {
+  it('should deposit & withdraw', async () => {
     await token.connect(addr1).approve(pool.address, 100);
     await pool.connect(addr1).deposit(100, {
-      value: ethers.utils.parseEther("100").toString(),
+      value: ethers.utils.parseEther('100').toString(),
     });
 
     await pool.connect(addr1).withdraw(25); // in %!!!
 
     const { provider } = waffle;
     expect(
-      ethers.utils.formatEther(await provider.getBalance(pool.address))
-    ).to.equal("75.075");
-    expect((await token.balanceOf(addr1.address)).toString()).to.equal("925");
-    expect((await token.balanceOf(pool.address)).toString()).to.equal("99999075");
+      ethers.utils.formatEther(await provider.getBalance(pool.address)),
+    ).to.equal('75.075');
+    expect((await token.balanceOf(addr1.address)).toString()).to.equal('925');
+    expect((await token.balanceOf(pool.address)).toString()).to.equal('99999075');
   });
 
-  it("should swap in both directions", async () => {
+  it('should swap in both directions', async () => {
     await token.connect(addr1).approve(pool.address, 100);
     await pool.connect(addr1).deposit(100, {
-      value: ethers.utils.parseEther("100").toString(),
+      value: ethers.utils.parseEther('100').toString(),
     });
 
     await pool.connect(addr1).swapToken1ToToken2({
-      value: ethers.utils.parseEther("50").toString(),
+      value: ethers.utils.parseEther('50').toString(),
     });
 
     await token.connect(addr1).approve(pool.address, 34);

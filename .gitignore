@@ -2,5 +2,4 @@ node_modules
 build
 .env
 .idea
-src/abis
 cache

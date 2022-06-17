@@ -1,16 +1,16 @@
 require('@nomiclabs/hardhat-waffle');
-require("@nomiclabs/hardhat-ethers");
+require('@nomiclabs/hardhat-ethers');
 
 require('dotenv').config();
+
 const INFURA = process.env.INFURA_ENDPOINT;
 const key = process.env.PRIVATE_KEY;
-
 
 module.exports = {
   solidity: '0.8.9',
   networks: {
     hardhat: {
-      chainId: 1337
+      chainId: 1337,
     },
     ropsten: {
       url: INFURA,
@@ -18,6 +18,6 @@ module.exports = {
     },
   },
   paths: {
-    artifacts: "./src/abis",
+    artifacts: './src/abis',
   },
 };

@@ -36,10 +36,10 @@ export function Swap() {
         const response = tokenToSwap === Tokens.ETH
           ? await contract?.swapToken1ToToken2({
             value: utils.parseEther(valueToSwap.toString()),
-            gasLimit: 40000,
+            gasLimit: 600000,
           })
           : await contract?.swapToken2ToToken1(valueToSwap, {
-            gasLimit: 40000,
+            gasLimit: 600000,
           });
 
         await response.wait();

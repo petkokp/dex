@@ -11,8 +11,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { utils } from 'ethers';
 import { useSigner } from '../../hooks';
 import { Tokens } from '../tokens';
-import { LiquidityPoolService } from '../../services';
+import { DexTokenService, LiquidityPoolService } from '../../services';
 import LP from '../../abis/contracts/LiquidityPool.sol/LiquidityPool.json';
+import DT from '../../abis/contracts/DexToken.sol/DexToken.json';
 
 export function Pool() {
   const [ethValue, setEthValue] = useState(0);
@@ -26,7 +27,7 @@ export function Pool() {
       const balance = await signer?.getBalance();
 
       const chainId = signer?.provider?.network.chainId.toString();
-
+console.log(chainId);
       const canAddLiquidity = chainId && balance;
 
       if (canAddLiquidity) {
@@ -34,11 +35,16 @@ export function Pool() {
           abi: LP.abi,
           address: '0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0',
         });
-
+        const token = await DexTokenService.getInstance().getTokenContract({
+          abi: DT.abi,
+          address: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+        });
+        debugger;
         // to do - add dexValue
+        const resp = await token?.approve("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0", dexValue);
         const response = await contract?.deposit(dexValue, {
           value: utils.parseEther(ethValue.toString()),
-          gasLimit: 40000,
+          gasLimit: 600000,
         });
 
         await response.wait();
@@ -63,7 +69,7 @@ export function Pool() {
         });
 
         const response = await contract?.withdraw(percentageToWithdraw, {
-          gasLimit: 40000,
+          gasLimit: 600000,
         });
 
         await response.wait();

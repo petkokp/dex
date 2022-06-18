@@ -12,6 +12,7 @@ import { useSigner } from '../../hooks';
 import { Tokens } from '../tokens';
 import { LiquidityPoolService } from '../../services';
 import LP from '../../abis/contracts/LiquidityPool.sol/LiquidityPool.json';
+import { utils } from 'ethers';
 
 export function Pool() {
   const [ethValue, setEthValue] = useState(0);
@@ -26,8 +27,7 @@ export function Pool() {
 
       const chainId = signer?.provider?.network.chainId.toString();
 
-      // eth or dex value?
-      const canAddLiquidity = chainId && balance && ethValue && balance.gt(ethValue);
+      const canAddLiquidity = chainId && balance;
 
       if (canAddLiquidity) {
         const contract = await LiquidityPoolService.getInstance().getLiquidityPoolContract({
@@ -36,7 +36,8 @@ export function Pool() {
         });
 
         // to do - add dexValue
-        const response = await contract?.deposit(ethValue, {
+        const response = await contract?.deposit(dexValue, {
+          value: utils.parseEther(ethValue.toString()),
           gasLimit: 40000,
         });
 

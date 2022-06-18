@@ -8,11 +8,11 @@ import {
   Divider,
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { utils } from 'ethers';
 import { useSigner } from '../../hooks';
 import { Tokens } from '../tokens';
 import { LiquidityPoolService } from '../../services';
 import LP from '../../abis/contracts/LiquidityPool.sol/LiquidityPool.json';
-import { utils } from 'ethers';
 
 export function Pool() {
   const [ethValue, setEthValue] = useState(0);
